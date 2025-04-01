@@ -1,0 +1,177 @@
+.mainContainer {
+  background-color: #7459d9;
+  overflow: auto;
+}
+
+.contentWrapper { 
+  /* Quebra em 2 container */
+  background-color: #e6e6f0;
+  gap: 20px;
+  display: flex;  
+  flex-direction: row;  
+  width: 100vw;
+  height: 100vh;
+}
+
+.inputColumn {
+  flex-direction: column;
+  align-items: stretch;
+  width: 25vw;
+  margin-left: 0;
+  line-height: normal;
+  display: flex;
+}
+
+.promptsContainer {
+  background-color: #f2f2f7;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  padding: 56px 10px;
+  display: flex;
+  position: relative;
+}
+
+.promptsWrapper {
+  z-index: 0;
+  width: 250px;
+  min-width: 240px;
+  margin-top: auto;
+  margin-bottom: auto;
+  font-family:
+    DM Sans,
+    -apple-system,
+    Roboto,
+    Helvetica,
+    sans-serif;
+}
+
+.promptCard {
+  background-color: #fff;
+  border-radius: 20px;
+  width: 100%;
+  padding: 16px;
+  margin-top: 20px;
+  box-shadow:
+    0 8px 8px #32324714,
+    0 8px 16px #3232470f;
+}
+
+.promptCard:first-child {
+  margin-top: 0;
+}
+
+.promptQuestion {
+  color: #11263c;
+  font-feature-settings:
+    "liga" off,
+    "clig" off;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 21px;
+}
+
+.promptExample {
+  color: #2a4057;
+  background-color: #fff;
+  border: 1px solid #e1e1e5;
+  border-radius: 14px;
+  gap: 10px;
+  width: 100%;
+  margin-top: 10px;
+  padding: 16px;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 20px;
+}
+
+.scrollIndicator {
+  z-index: 0;
+  border-radius: 35px;
+  justify-content: start;
+  align-self: start;
+  align-items: start;
+  gap: 10px;
+  width: 10px;
+  height: 788px;
+  min-height: 788px;
+  display: flex;
+  position: absolute;
+  bottom: 56px;
+  right: 12px;
+}
+
+.scrollThumb {
+  background-color: #d8d8e8;
+  border-radius: 35px;
+  width: 10px;
+  min-height: 108px;
+  display: flex;
+}
+
+.previewColumn {
+  flex-direction: column;
+  align-items: stretch;
+  width: 75%;
+  margin-left: 20px;
+  line-height: normal;
+  display: flex;
+}
+
+.previewContainer {
+  background-color: #e6e6f0;
+  flex-grow: 1;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 900px;
+  display: flex;
+}
+
+.previewContent {
+  background-color: #fff;
+  flex-direction: column;
+  justify-content: center;
+  align-self: stretch;
+  align-items: center;
+  width: 570px;
+  min-width: 240px;
+  margin-top: auto;
+  margin-bottom: auto;
+  padding: 319px 80px;
+  display: flex;
+  overflow: hidden;
+}
+
+.previewImage {
+  aspect-ratio: 0.96;
+  object-fit: contain;
+  object-position: center;
+  width: 72px;
+}
+
+@media (width <= 991px) {
+  .contentWrapper {
+    max-width: 100%;
+  }
+
+  .twoColumnLayout {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+
+  .inputColumn {
+    width: 100%;
+  }
+
+  .previewColumn {
+    width: 100%;
+  }
+
+  .previewContent {
+    padding: 100px 20px;
+  }
+}
