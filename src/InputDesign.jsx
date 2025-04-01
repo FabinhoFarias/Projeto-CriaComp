@@ -96,7 +96,7 @@ const InputDesign = () => {
 
 
       <div className={styles.contentWrapper}>{/* Quebra em 2 container */}
-        {/* Remover classes extra para evitar trabalho */}
+          {/* Remover classes extra para evitar trabalho */}
           <section className={styles.inputColumn}>
             <div className={styles.promptsContainer}>
              

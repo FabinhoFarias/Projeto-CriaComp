@@ -6,7 +6,6 @@
 .contentWrapper { 
   /* Quebra em 2 container */
   background-color: #e6e6f0;
-  gap: 20px;
   display: flex;  
   flex-direction: row;  
   width: 100vw;
@@ -14,28 +13,34 @@
 }
 
 .inputColumn {
-  flex-direction: column;
-  align-items: stretch;
-  width: 25vw;
-  margin-left: 0;
-  line-height: normal;
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 30vw;
+  margin:auto;
+  overflow: hidden;
 }
 
 .promptsContainer {
+  /* background-color: #11115f; */
   background-color: #f2f2f7;
   justify-content: center;
   align-items: flex-start;
   gap: 10px;
   width: 100%;
+  height: 100vh;
   padding: 56px 10px;
   display: flex;
   position: relative;
+  overflow-y: auto; /* Habilita o scroll vertical */
+  scrollbar-width: thin; /* Para navegadores que suportam */
+  scrollbar-color: #bbb transparent;
 }
 
 .promptsWrapper {
+  /* background-color: aqua; */
   z-index: 0;
-  width: 250px;
+  width: 20vw;
   min-width: 240px;
   margin-top: auto;
   margin-bottom: auto;
@@ -50,7 +55,8 @@
 .promptCard {
   background-color: #fff;
   border-radius: 20px;
-  width: 100%;
+  width: 18vw;
+  height: auto;
   padding: 16px;
   margin-top: 20px;
   box-shadow:
@@ -59,7 +65,7 @@
 }
 
 .promptCard:first-child {
-  margin-top: 0;
+  margin-top: 0px;
 }
 
 .promptQuestion {
@@ -72,19 +78,57 @@
   line-height: 21px;
 }
 
+.inputWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.fakePlaceholder {
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  color: gray;
+  font-size: 13px;
+  pointer-events: none;
+  white-space: pre-wrap; /* Permite múltiplas linhas */
+  word-wrap: break-word;
+  width: 218px;
+  line-height: 20px;
+  padding: 8px;
+}
+
 .promptExample {
+  width: 93%;
+  min-height: 30px; /* Altura mínima */
+  max-height: 150px; /* Define um limite para evitar excesso */
+  overflow-y: auto; /* Adiciona rolagem se ultrapassar o limite */
+  padding: 8px;
+  border: 1px solid #e1e1e5;
+  border-radius: 14px;
+  font-size: 13px;
+  resize: none; /* Impede redimensionamento manual */
+}
+
+/* .promptExample {
   color: #2a4057;
   background-color: #fff;
   border: 1px solid #e1e1e5;
   border-radius: 14px;
+  display: block;
+  flex-wrap: wrap;
+  overflow: auto;
   gap: 10px;
-  width: 100%;
+  width: 218px;
+  height: auto;
   margin-top: 10px;
   padding: 16px;
   font-size: 13px;
   font-weight: 400;
-  line-height: 20px;
-}
+  
+  word-wrap: break-word; /* Garante que palavras longas sejam quebradas 
+  white-space: normal; /* Permite que o texto quebre automaticamente */
+/* } */
+
 
 .scrollIndicator {
   z-index: 0;
@@ -113,7 +157,7 @@
 .previewColumn {
   flex-direction: column;
   align-items: stretch;
-  width: 75%;
+  width: 80vw;
   margin-left: 20px;
   line-height: normal;
   display: flex;
@@ -126,7 +170,7 @@
   align-items: center;
   gap: 10px;
   width: 100%;
-  min-height: 900px;
+  height: 100vh;
   display: flex;
 }
 
@@ -136,11 +180,11 @@
   justify-content: center;
   align-self: stretch;
   align-items: center;
-  width: 570px;
+  height: 70vh;
   min-width: 240px;
   margin-top: auto;
   margin-bottom: auto;
-  padding: 319px 80px;
+  /* padding: 319px 80px; */
   display: flex;
   overflow: hidden;
 }
