@@ -1,8 +1,19 @@
 import os
 import openai
 from dotenv import load_dotenv
+import google.generativeai as genai
+from diffusers import DiffusionPipeline
+import torch
+from gradio_client import Client, handle_file
+from PIL import Image
 
 load_dotenv()  # Carrega variáveis do .env
+
+# Configura a chave da API do Gemini
+GOOGLE_API_KEY = os.getenv("GEMINI_API_KEY")
+genai.configure(api_key=GOOGLE_API_KEY)
+
+
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 def gerar_anuncio_texto(nome_produto: str, caracteristica: str, problemas: str) -> str:
@@ -24,61 +35,51 @@ def gerar_anuncio_texto(nome_produto: str, caracteristica: str, problemas: str) 
     Responda apenas com o texto.
     """
 
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.7,
-    )
+    response = genai.GenerativeModel('models/gemini-1.5-pro').generate_content(prompt)
 
-    return response.choices[0].message.content.strip()
+    return response.text
 
 
 
 # ---------------------------------------------------------
 # Função que integra o fluxo completo (células do Colab)
 # ---------------------------------------------------------
-import google.generativeai as genai
-from diffusers import DiffusionPipeline
-import torch
-from gradio_client import Client, handle_file
-from PIL import Image
 
-# Configura a chave da API do Gemini
-GOOGLE_API_KEY = os.getenv("GEMINI_API_KEY")
-genai.configure(api_key=GOOGLE_API_KEY)
 
 def gerar_anuncio_completo(brand_name: str, slogan: str, brand_info: str, post_info: str, img_prompt: str, img_path: str):
     """
-    Função que executa as etapas:
-    1. Extrai características do texto do post.
-    2. Resume as informações da marca.
-    3. Gera 4 opções de anúncio.
-    4. Seleciona uma opção (a primeira por padrão).
-    5. Gera/edita imagem publicitária usando Diffusers e Gradio Client.
+    Executa as etapas:
+      1. Extrai características do post.
+      2. Resume as informações da marca.
+      3. Gera 4 opções de anúncio.
+      4. Seleciona uma opção (a primeira por padrão).
+      5. Gera ou edita imagem publicitária usando Diffusers e Gradio Client.
     """
-
+    # Inicializa o modelo Gemini
+    model = genai.GenerativeModel('models/gemini-1.5-pro')
+    
     # 1) Extrair características do post_info
     post_extract_prompt = f'List ONLY the characteristics presented in the text: "{post_info}"'
-    response = genai.GenerativeModel('models/gemini-1.5-pro').generate_content(post_extract_prompt)
+    response = model.generate_content(post_extract_prompt)
     extracted_post_info = response.text
 
     # 2) Resumir brand_info
     brand_extract_prompt = f'Summarize this descriptive text, making it more objective and keeping only relevant information: "{brand_info}"'
-    response_brand = genai.GenerativeModel('models/gemini-1.5-pro').generate_content(brand_extract_prompt)
+    response_brand = model.generate_content(brand_extract_prompt)
     extracted_brand_info = response_brand.text
 
-    # 3) Gerar opções de anúncio
+    # 3) Gerar opções de anúncio (4 opções)
     generation_prompt = (
         f'Create FOUR options of advertising text that is:\n'
         f'{extracted_post_info}\n'
         f'about a brand called {brand_name} and described by: {extracted_brand_info}'
     )
-    final_response = genai.GenerativeModel('models/gemini-1.5-pro').generate_content(generation_prompt)
+    final_response = model.generate_content(generation_prompt)
+    # Filtra as opções que contenham o nome da marca, ou, se nenhuma, pega todas
     options = [opt.strip() for opt in final_response.text.split("\n") if brand_name in opt]
     if not options:
         options = [opt.strip() for opt in final_response.text.split("\n")]
-
-    chosen_text = options[0]  # Por simplicidade, escolhemos a primeira opção
+    chosen_text = options[0] if options else ""
 
     # 4) Preparar prompt para edição da imagem
     if slogan:
@@ -86,16 +87,16 @@ def gerar_anuncio_completo(brand_name: str, slogan: str, brand_info: str, post_i
     else:
         prompt_for_image = f'Write "{brand_name}" in an empty space in the image'
 
+    # Inicializa o cliente do Gradio para edição de imagem
     client = Client("ameerazam08/Gemini-Image-Edit")
     final_image_url = None
 
     # 5) Geração ou edição da imagem
     if not img_path:
-        # Não foi enviada imagem, então gera imagem do zero.
+        # Caso não tenha imagem enviada, gera uma nova imagem:
         gen_img_prompt = f'Make a prompt to use with an image generative model, following the description provided : "{img_prompt}"'
-        final_img_prompt = genai.GenerativeModel('models/gemini-1.5-pro').generate_content(gen_img_prompt).text
+        final_img_prompt = model.generate_content(gen_img_prompt).text
 
-        # Carrega o pipeline de geração de imagem
         try:
             pipeline = DiffusionPipeline.from_pretrained(
                 "stabilityai/stable-diffusion-xl-base-1.0",
@@ -106,9 +107,11 @@ def gerar_anuncio_completo(brand_name: str, slogan: str, brand_info: str, post_i
         except Exception as e:
             raise Exception("Erro ao carregar o pipeline de difusão: " + str(e))
 
+        # Gera a imagem com o prompt final
         image = pipeline(final_img_prompt).images[0]
         image.save("image.png")
 
+        # Envia a imagem para edição (inserindo textos) via Gradio Client
         result = client.predict(
             composite_pil=handle_file("image.png"),
             prompt=prompt_for_image,
@@ -118,9 +121,9 @@ def gerar_anuncio_completo(brand_name: str, slogan: str, brand_info: str, post_i
         if result and result[0]:
             final_image_url = result[0][0]['image']
     else:
-        # Se houver um caminho para imagem, edita a imagem existente.
+        # Se houver caminho para imagem, edita a imagem existente:
         gen_img_prompt = f'Summarize in the SHORTEST way possible the following description: "{img_prompt}"'
-        short_prompt = genai.GenerativeModel('models/gemini-1.5-pro').generate_content(gen_img_prompt).text
+        short_prompt = model.generate_content(gen_img_prompt).text
         bg_prompt = f'Make a {short_prompt} background for the image'
 
         tmp_result = client.predict(
