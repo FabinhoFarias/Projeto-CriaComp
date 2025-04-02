@@ -1,14 +1,8 @@
-# model.py
-
 import os
 import openai
 from dotenv import load_dotenv
 
 load_dotenv()  # Carrega variáveis do .env
-
-# -------------------------
-# Função utilizando OpenAI
-# -------------------------
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 def gerar_anuncio_texto(nome_produto: str, caracteristica: str, problemas: str) -> str:
@@ -31,12 +25,13 @@ def gerar_anuncio_texto(nome_produto: str, caracteristica: str, problemas: str) 
     """
 
     response = openai.ChatCompletion.create(
-        model="gpt-4",  
+        model="gpt-3.5-turbo",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.7,
     )
 
     return response.choices[0].message.content.strip()
+
 
 
 # ---------------------------------------------------------
