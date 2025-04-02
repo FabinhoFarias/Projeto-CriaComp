@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+google-generativeai
+gradio_client
+diffusers
+torch
+transformers
+huggingface_hub
+Pillow
+python-dotenv
+openai
