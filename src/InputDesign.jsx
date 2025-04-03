@@ -96,35 +96,65 @@ const InputDesign = () => {
     <main className={styles.mainContainer}> {/* Container Principal */}
 
       <div className={styles.contentWrapper}>{/* Quebra em 2 container */}
-          {/* Remover classes extra para evitar trabalho */}
-          <section className={styles.inputColumn}>
-      
-            <form className={styles.promptsWrapper}>
-              {prompts.map((prompt, index) =>
-                prompt.isUploadFile ? (
-                  <PromptCardImg
+                <section className={styles.inputColumn}>
+              
+                <form
+                  className={styles.promptsWrapper}
+                  onSubmit={async (e) => {
+                  e.preventDefault();
+
+                  const formData = new FormData(e.target);
+                  const data = {
+                    nome_produto: formData.get("nomeProduto") || "",
+                    caracteristica: formData.get("principalCaracteristica") || "",
+                    problemas: formData.get("problemaQueResolve") || "",
+                  };
+
+                  try {
+                    const response = await fetch("http://127.0.0.1:8000/gerar-anuncio", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(data),
+                    });
+
+                    if (!response.ok) {
+                    throw new Error("Erro ao gerar anúncio");
+                    }
+
+                    const result = await response.json();
+                    console.log("Anúncio gerado com sucesso:", result);
+                  } catch (error) {
+                    console.error("Erro na requisição:", error);
+                  }
+                  }}
+                >
+                  {prompts.map((prompt, index) =>
+                  prompt.isUploadFile ? (
+                    <PromptCardImg
                     key={index}
                     question={prompt.question}
                     nomeVariavel={prompt.nomeVariavel}
                     campoObrigatorio={prompt.campoObrigatorio}
-                  />
-                ) : (
-                  <PromptCard
+                    />
+                  ) : (
+                    <PromptCard
                     key={index}
                     question={prompt.question}
                     example={prompt.example}
                     nomeVariavel={prompt.nomeVariavel}
                     campoObrigatorio={prompt.campoObrigatorio}
-                  />
-                )
-              )}
-              <button type="submit">Gerar anúncio</button>
-            </form>
+                    />
+                  )
+                  )}
+                  <button type="submit">Gerar anúncio</button>
+                </form>
 
-              
-              {/* <div className={styles.scrollIndicator}>
-                <div className={styles.scrollThumb} />
-              </div> */}
+                  
+                  {/* <div className={styles.scrollIndicator}>
+                  <div className={styles.scrollThumb} />
+                  </div> */}
             
           </section>
 
